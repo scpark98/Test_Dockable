@@ -8,6 +8,8 @@
 #include "Test_DockableDlg.h"
 #include "afxdialogex.h"
 
+#include "Functions.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -110,6 +112,18 @@ BOOL CTestDockableDlg::OnInitDialog()
 	m_docker.Create(IDD_DOCKER, this);
 	m_docker.ShowWindow(SW_SHOW);
 
+	RestoreWindowPosition(&theApp, this);
+
+	write_profile_value(&theApp, _T("m_docker"), _T("int"), 123);
+	write_profile_value(&theApp, _T("m_docker"), _T("float"), 1.23);
+	write_profile_value(&theApp, _T("m_docker"), _T("double"), 3.141592);
+	write_profile_value(&theApp, _T("m_docker"), _T("string"), CString("abcd"));
+
+	int n = get_profile_value(&theApp, _T("m_docker"), _T("int"), 56123);
+	float f = get_profile_value(&theApp, _T("m_docker"), _T("float"), 61.23);
+	double d = get_profile_value(&theApp, _T("m_docker"), _T("double"), 63.141592);
+	CString str = get_profile_value(&theApp, _T("m_docker"), _T("string"), CString("656abcd"));
+
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -128,6 +142,8 @@ void CTestDockableDlg::OnSysCommand(UINT nID, LPARAM lParam)
 		}
 		else if (nID == SC_RESTORE)
 		{
+			//restore시에 창 애니메이션이 있으므로 docker를 바로 show하면 어색하다.
+			//timer를 써서 show를 하는 것도 좋을듯하다.
 			m_docker.ShowWindow(SW_SHOW);
 		}
 
@@ -177,11 +193,20 @@ void CTestDockableDlg::OnBnClickedOk()
 
 	if (m_float)
 	{
-		m_docker.MoveWindow(100, 100, 400, 300);
+		//floating 할 때는 캡션바, 시스템버튼, 크기조정이 가능하도록 속성을 변경시켜줘야 한다.
+		//...
+		CRect r = get_profile_value(&theApp, _T("m_docker"), _T("position"), CRect(0, 0, 400, 300));
+		m_docker.MoveWindow(r);
 	}
 	else
 	{
+		//docking할 때 현재 위치를 기억했다가 floating 할 때 그 위치로 복원시켜야 한다.
+		//...
 		CRect r;
+		m_docker.GetWindowRect(r);
+		write_profile_value(&theApp, _T("m_docker"), _T("position"), r);
+
+
 		GetWindowRect(r);
 		m_docker.SetWindowPos(&wndNoTopMost, r.left + 20, r.top + 32, 0, 0, SWP_NOSIZE);
 	}
@@ -198,6 +223,8 @@ void CTestDockableDlg::OnWindowPosChanged(WINDOWPOS* lpwndpos)
 	CDialogEx::OnWindowPosChanged(lpwndpos);
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	SaveWindowPosition(&theApp, this);
+
 	if (!m_docker.m_hWnd)
 		return;
 

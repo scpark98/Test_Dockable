@@ -31,6 +31,7 @@ BEGIN_MESSAGE_MAP(CDockerDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CDockerDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CDockerDlg::OnBnClickedCancel)
 	ON_WM_PAINT()
+	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
 
 
@@ -53,4 +54,12 @@ void CDockerDlg::OnPaint()
 	GetClientRect(&rc);
 
 	dc.FillSolidRect(rc, RGB(240, 120, 120)); // 배경색 설정
+}
+
+void CDockerDlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	DefWindowProc(WM_NCLBUTTONDOWN, HTCAPTION, MAKEWORD(point.x, point.y));
+
+	CDialogEx::OnLButtonDown(nFlags, point);
 }

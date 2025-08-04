@@ -25,4 +25,5 @@ public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnPaint();
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };
