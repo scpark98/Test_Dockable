@@ -195,6 +195,14 @@ void CTestDockableDlg::OnBnClickedOk()
 	{
 		//floating 할 때는 캡션바, 시스템버튼, 크기조정이 가능하도록 속성을 변경시켜줘야 한다.
 		//...
+		DWORD dwStyle = GetWindowLongPtr(m_hWnd, GWL_STYLE);
+		dwStyle |= WS_THICKFRAME;
+		dwStyle |= WS_CAPTION;
+		dwStyle &= ~WS_MINIMIZEBOX;
+		SetWindowLongPtr(m_docker.m_hWnd, GWL_STYLE, dwStyle);
+
+		m_docker.SetWindowText(_T("Child Window"));
+
 		CRect r = get_profile_value(&theApp, _T("m_docker"), _T("position"), CRect(0, 0, 400, 300));
 		m_docker.MoveWindow(r);
 	}
@@ -208,7 +216,12 @@ void CTestDockableDlg::OnBnClickedOk()
 
 
 		GetWindowRect(r);
-		m_docker.SetWindowPos(&wndNoTopMost, r.left + 20, r.top + 32, 0, 0, SWP_NOSIZE);
+		m_docker.SetWindowPos(&wndNoTopMost, r.left + 20, r.top + 32, 400, 300, SWP_SHOWWINDOW);
+
+		DWORD dwStyle = GetWindowLongPtr(m_hWnd, GWL_STYLE);
+		dwStyle &= ~WS_THICKFRAME;
+		dwStyle &= ~WS_CAPTION;
+		SetWindowLongPtr(m_docker.m_hWnd, GWL_STYLE, dwStyle);
 	}
 }
 
